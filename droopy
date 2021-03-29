@@ -6,6 +6,7 @@ Copyright 2008-2013 (c) Pierre Duquesne <stackp@online.fr>
 Licensed under the New BSD License.
 
 Changelog
+   20210329 * Applied fixes for index
    20151025 * Global variables removed
             * Code refactoring and re-layout
             * Python 2 and 3 compatibility
@@ -324,6 +325,11 @@ class HTTPUploadHandler(httpserver.BaseHTTPRequestHandler):
             for item in file_items:
                 filename = _decode_str_if_py2(basename(item.filename), "utf-8")
                 if filename == "":
+                    continue
+                if filename.lower() == "index.html" or filename.lower() == "index.htm" or filename.lower() == "index.php":
+                    self.send_response(303)
+                    self.send_header('Location', '/')
+                    self.end_headers()
                     continue
                 localpath = _encode_str_if_py2(os.path.join(self.directory, filename), "utf-8")
                 root, ext = os.path.splitext(localpath)
